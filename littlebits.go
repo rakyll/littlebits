@@ -10,7 +10,7 @@ import (
 
 const name = "KORG 2ch Audio Device"
 
-const maxBufferSize = 1024
+const maxBufferSize = 8192
 
 func init() {
 	portaudio.Initialize() // handle error
