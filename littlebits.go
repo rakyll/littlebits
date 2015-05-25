@@ -102,12 +102,7 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 	if len(p) > maxBufferSize {
 		return 0, fmt.Errorf("buffer size cannot be larger than %d", maxBufferSize)
 	}
-	// copy(w.buf, p)
-	fmt.Println(w.buf)
-	if err := w.s.Write(); err != nil {
-		return 0, err
-	}
-	return len(p), nil
+	panic("not yet implemented")
 }
 
 func (w *Writer) Close() error {
