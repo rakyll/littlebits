@@ -95,6 +95,7 @@ func (r *Reader) Read(p []byte) (n int, err error) {
 	return len(p), nil // TODO(jbd): is there a possibility we can read less than buffer size?
 }
 
+// Close frees the underyling sources.
 func (r *Reader) Close() error {
 	// TODO(jbd): auto terminate portaudio if no devices are being used?
 	return r.s.Close()
