@@ -76,7 +76,7 @@ func NewReader(name string, bufferSize int) (*Reader, error) {
 // error. Otherwise, fills up to n bytes it can read from the
 // module and returns.
 //
-// n is always the len(p), the call will block until that number
+// n is always len(p), the call will block until n number
 // of bytes are read from the module.
 func (r *Reader) Read(p []byte) (n int, err error) {
 	if len(p) > len(r.buf) {
