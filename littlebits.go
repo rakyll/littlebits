@@ -81,7 +81,7 @@ func NewReader(name string, bufferSize int) (*Reader, error) {
 // of bytes are read from the module.
 func (r *Reader) Read(p []byte) (n int, err error) {
 	if len(p) > len(r.buf) {
-		return 0, fmt.Errorf("p is exceeding reader buffer size limit = %v", len(r.buf))
+		return 0, fmt.Errorf("len(p) is exceeding reader buffer size limit = %v", len(r.buf))
 	}
 	if err := r.s.Start(); err != nil {
 		return 0, err
