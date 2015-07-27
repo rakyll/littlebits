@@ -8,18 +8,16 @@ import (
 	"code.google.com/p/portaudio-go/portaudio"
 )
 
-const name = "KORG 2ch Audio Device"
-
-const maxBufferSize = 8192
+const defaultName = "KORG 2ch Audio Device"
 
 func init() {
 	portaudio.Initialize() // handle error
 }
 
-func initDevice(in bool) (dev *portaudio.DeviceInfo, s *portaudio.Stream, buf []byte, err error) {
+func initDevice(name string, in bool, buf []byte) (dev *portaudio.DeviceInfo, s *portaudio.Stream, err error) {
 	i, err := portaudio.Devices()
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	for _, info := range i {
@@ -30,10 +28,9 @@ func initDevice(in bool) (dev *portaudio.DeviceInfo, s *portaudio.Stream, buf []
 		}
 	}
 	if dev == nil {
-		return nil, nil, nil, errors.New("no little bits usb I/O found")
+		return nil, nil, errors.New("no little bits usb I/O found")
 	}
 
-	buf = make([]byte, maxBufferSize)
 	p := portaudio.LowLatencyParameters(dev, dev)
 	if in {
 		s, err = portaudio.OpenStream(p, buf, []byte{})
@@ -49,22 +46,29 @@ type Reader struct {
 	buf []byte
 }
 
-func NewReader() (*Reader, error) {
-	dev, s, buf, err := initDevice(true)
-	if err != nil {
-		return nil, err
+func NewReader(name string, bufferSize int) (*Reader, error) {
+	if name == "" {
+		name = defaultName
 	}
-	if err := s.Start(); err != nil {
+	buf := make([]byte, bufferSize)
+	dev, s, err := initDevice(name, true, buf)
+	if err != nil {
 		return nil, err
 	}
 	return &Reader{dev: dev, s: s, buf: buf}, nil
 }
 
 func (r *Reader) Read(p []byte) (n int, err error) {
-	if len(p) > maxBufferSize {
-		return 0, fmt.Errorf("buffer size cannot be larger than %d", maxBufferSize)
+	if len(p) > len(r.buf) {
+		return 0, fmt.Errorf("p is exceeding reader buffer size limit = %v", len(r.buf))
+	}
+	if err := r.s.Start(); err != nil {
+		return 0, err
 	}
 	if err := r.s.Read(); err != nil {
+		return 0, err
+	}
+	if err := r.s.Stop(); err != nil {
 		return 0, err
 	}
 	copy(p, r.buf[:len(p)])
@@ -72,11 +76,8 @@ func (r *Reader) Read(p []byte) (n int, err error) {
 }
 
 func (r *Reader) Close() error {
-	r.s.Stop()
+	// TODO(jbd): auto terminate portaudio if no devices are being used?
 	return r.s.Close()
-	// TODO(jbd): auto terminate portaudio if no devices are
-	// being used.
-}
 }
 
 // type Writer struct {
