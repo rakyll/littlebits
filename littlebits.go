@@ -77,35 +77,36 @@ func (r *Reader) Close() error {
 	// TODO(jbd): auto terminate portaudio if no devices are
 	// being used.
 }
-
-type Writer struct {
-	dev *portaudio.DeviceInfo
-	s   *portaudio.Stream
-	buf []byte
 }
 
-func NewWriter() (*Writer, error) {
-	dev, s, buf, err := initDevice(false)
-	if err != nil {
-		return nil, err
-	}
-	if err := s.Start(); err != nil {
-		return nil, err
-	}
-	for i := range buf {
-		buf[i] = 10
-	}
-	return &Writer{dev: dev, s: s, buf: buf}, nil
-}
+// type Writer struct {
+// 	dev *portaudio.DeviceInfo
+// 	s   *portaudio.Stream
+// 	buf []byte
+// }
 
-func (w *Writer) Write(p []byte) (n int, err error) {
-	if len(p) > maxBufferSize {
-		return 0, fmt.Errorf("buffer size cannot be larger than %d", maxBufferSize)
-	}
-	panic("not yet implemented")
-}
+// func NewWriter() (*Writer, error) {
+// 	dev, s, buf, err := initDevice(false)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	if err := s.Start(); err != nil {
+// 		return nil, err
+// 	}
+// 	for i := range buf {
+// 		buf[i] = 10
+// 	}
+// 	return &Writer{dev: dev, s: s, buf: buf}, nil
+// }
 
-func (w *Writer) Close() error {
-	w.s.Stop()
-	return w.s.Close()
-}
+// func (w *Writer) Write(p []byte) (n int, err error) {
+// 	if len(p) > maxBufferSize {
+// 		return 0, fmt.Errorf("buffer size cannot be larger than %d", maxBufferSize)
+// 	}
+// 	panic("not yet implemented")
+// }
+
+// func (w *Writer) Close() error {
+// 	w.s.Stop()
+// 	return w.s.Close()
+// }
