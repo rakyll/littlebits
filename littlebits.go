@@ -102,34 +102,32 @@ func (r *Reader) Close() error {
 	return r.s.Close()
 }
 
-// type Writer struct {
-// 	dev *portaudio.DeviceInfo
-// 	s   *portaudio.Stream
-// 	buf []byte
-// }
+type Writer struct {
+	dev *portaudio.DeviceInfo
+	s   *portaudio.Stream
+	buf []byte
+}
 
-// func NewWriter() (*Writer, error) {
-// 	dev, s, buf, err := initDevice(false)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if err := s.Start(); err != nil {
-// 		return nil, err
-// 	}
-// 	for i := range buf {
-// 		buf[i] = 10
-// 	}
-// 	return &Writer{dev: dev, s: s, buf: buf}, nil
-// }
+func NewWriter(name string, bufferSize int) (*Writer, error) {
+	if name == "" {
+		name = defaultName
+	}
+	buf := make([]byte, bufferSize)
+	dev, s, err := initDevice(name, false, buf)
+	if err != nil {
+		return nil, err
+	}
+	return &Writer{dev: dev, s: s, buf: buf}, nil
+}
 
-// func (w *Writer) Write(p []byte) (n int, err error) {
-// 	if len(p) > maxBufferSize {
-// 		return 0, fmt.Errorf("buffer size cannot be larger than %d", maxBufferSize)
-// 	}
-// 	panic("not yet implemented")
-// }
+func (w *Writer) Write(p []byte) (n int, err error) {
+	maxBufferSize := len(w.buf)
+	if len(p) > maxBufferSize {
+		return 0, fmt.Errorf("len(p) is exceeding reader buffer size limit = %v", maxBufferSize)
+	}
+	panic("not yet implemented")
+}
 
-// func (w *Writer) Close() error {
-// 	w.s.Stop()
-// 	return w.s.Close()
-// }
+func (w *Writer) Close() error {
+	return w.s.Close()
+}
