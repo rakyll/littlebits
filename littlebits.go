@@ -117,6 +117,9 @@ func NewWriter(name string, bufferSize int) (*Writer, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err := s.Start(); err != nil {
+		return nil, err
+	}
 	return &Writer{dev: dev, s: s, buf: buf}, nil
 }
 
@@ -125,19 +128,16 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 	if len(p) > maxBufferSize {
 		return 0, fmt.Errorf("len(p) is exceeding reader buffer size limit = %v", maxBufferSize)
 	}
-	if err := w.s.Start(); err != nil {
-		return 0, err
-	}
 	copy(w.buf, p)
 	if err := w.s.Write(); err != nil {
-		return 0, err
-	}
-	if err := w.s.Stop(); err != nil {
 		return 0, err
 	}
 	return len(p), err
 }
 
 func (w *Writer) Close() error {
+	if err := w.s.Stop(); err != nil {
+		return err
+	}
 	return w.s.Close()
 }
