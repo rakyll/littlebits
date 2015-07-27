@@ -69,6 +69,9 @@ func NewReader(name string, bufferSize int) (*Reader, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err := s.Start(); err != nil {
+		return nil, err
+	}
 	return &Reader{dev: dev, s: s, buf: buf}, nil
 }
 
@@ -83,13 +86,7 @@ func (r *Reader) Read(p []byte) (n int, err error) {
 	if len(p) > len(r.buf) {
 		return 0, fmt.Errorf("len(p) is exceeding reader buffer size limit = %v", len(r.buf))
 	}
-	if err := r.s.Start(); err != nil {
-		return 0, err
-	}
 	if err := r.s.Read(); err != nil {
-		return 0, err
-	}
-	if err := r.s.Stop(); err != nil {
 		return 0, err
 	}
 	copy(p, r.buf[:len(p)])
@@ -98,6 +95,9 @@ func (r *Reader) Read(p []byte) (n int, err error) {
 
 // Close frees the underyling sources.
 func (r *Reader) Close() error {
+	if err := r.s.Stop(); err != nil {
+		return err
+	}
 	// TODO(jbd): auto terminate portaudio if no devices are being used?
 	return r.s.Close()
 }
