@@ -51,10 +51,14 @@ type Reader struct {
 // name, "KORG 2ch Audio Device". You can specify a specific name
 // if you have more than a single USB I/O module connected to your
 // computer.
+//
 // bufferSize allows you allocate a buffer for the specific reader
 // that will be reused while reading from the module.
 // All readers must be closed after you are done with reading by
 // calling (*Reader).Close to free the underlying resources.
+//
+// Your USB I/O module needs to be in the "out" mode to work
+// properly with a Reader.
 func NewReader(name string, bufferSize int) (*Reader, error) {
 	if name == "" {
 		name = defaultName
