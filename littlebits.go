@@ -40,6 +40,7 @@ func initDevice(name string, in bool, buf []byte) (dev *portaudio.DeviceInfo, s 
 	return
 }
 
+// Reader is an io.Reader that reads from a littleBits USB I/O module.
 type Reader struct {
 	dev *portaudio.DeviceInfo
 	s   *portaudio.Stream
