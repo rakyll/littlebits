@@ -125,7 +125,17 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 	if len(p) > maxBufferSize {
 		return 0, fmt.Errorf("len(p) is exceeding reader buffer size limit = %v", maxBufferSize)
 	}
-	panic("not yet implemented")
+	if err := w.s.Start(); err != nil {
+		return 0, err
+	}
+	copy(w.buf, p)
+	if err := w.s.Write(); err != nil {
+		return 0, err
+	}
+	if err := w.s.Stop(); err != nil {
+		return 0, err
+	}
+	return len(p), err
 }
 
 func (w *Writer) Close() error {
