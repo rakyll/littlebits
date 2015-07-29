@@ -1,3 +1,5 @@
+// Package littlebits contains an io.Reader and io.Writer to read from
+// and write to a littleBits circuit. It requires USB I/O module.
 package littlebits
 
 import (
