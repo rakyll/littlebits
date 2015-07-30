@@ -50,6 +50,8 @@ func main() {
 			if err != nil {
 				continue
 			}
+
+			// Reader returns values for two channels, we can avoid one.
 			for i := 0; i < n/2; i++ {
 				vals[i] = float64(buf[i*2])
 			}
