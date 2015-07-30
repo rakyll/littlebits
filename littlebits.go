@@ -65,7 +65,7 @@ type Reader struct {
 
 // NewReader creates a new io.Reader to read from the littleBits
 // USB I/O module. If no name is given, the default audio device
-// name, "KORG 2ch Audio Device". You can specify a specific name
+// name, "KORG 2ch Audio Device", is used. You can specify a specific name
 // if you have more than a single USB I/O module connected to your
 // computer.
 //
@@ -118,12 +118,26 @@ func (r *Reader) Close() error {
 	return r.s.Close()
 }
 
+// A writer is an io.Writer that writes to an littleBits USB I/O module.
+// Writer requires the module to be in the "in" mode.
 type Writer struct {
 	dev *portaudio.DeviceInfo
 	s   *portaudio.Stream
 	buf []byte
 }
 
+// NewWriter returns an a Writer to write to a littleBits USB I/O module.
+// If no name is given, the default audio device name,
+// "KORG 2ch Audio Device, is used. You have to specificy a name if
+// there are multiple USB I/O modules are connected to your computer.
+//
+// // bufferSize allows you allocate a buffer for the specific writer
+// that will be reused while writing to the module.
+// All writers must be closed after you are done with reading by
+// calling (*Reader).Close to free the underlying resources.
+//
+// Your USB I/O module needs to be in the "in" mode to work
+// properly with a Writer.
 func NewWriter(name string, bufferSize int) (*Writer, error) {
 	if name == "" {
 		name = defaultName
@@ -139,6 +153,9 @@ func NewWriter(name string, bufferSize int) (*Writer, error) {
 	return &Writer{dev: dev, s: s, buf: buf}, nil
 }
 
+// Write writes len(p) bytes to the USB I/O module. If len(p)
+// is larger than the reader buffer size, it returns with an
+// error.
 func (w *Writer) Write(p []byte) (n int, err error) {
 	maxBufferSize := len(w.buf)
 	if len(p) > maxBufferSize {
@@ -151,6 +168,7 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 	return len(p), err
 }
 
+// Close closes the Writer and frees underlying resources.
 func (w *Writer) Close() error {
 	if err := w.s.Stop(); err != nil {
 		return err
